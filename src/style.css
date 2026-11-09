@@ -56,7 +56,45 @@ main.container { padding-top: 1.5rem; padding-bottom: 6rem; }
 
 .mcard { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 1rem; display: flex; flex-direction: column; gap: .3rem; }
 .mcard--out { opacity: .6; }
-.mcard--hl { border: 2px solid var(--sesame); box-shadow: 0 0 0 4px rgba(240,180,41,.25); }
+/* Làm nổi bật rõ món ăn được chọn từ trợ lý AI */
+.mcard--hl {
+  position: relative;
+  z-index: 5;
+  border: 3px solid #ff6b00 !important;
+  background: #fff3d6 !important;
+  box-shadow:
+    0 0 0 5px rgba(255, 107, 0, 0.25),
+    0 10px 28px rgba(255, 107, 0, 0.32) !important;
+  transform: translateY(-5px) scale(1.015);
+  animation: mcardHighlightPulse 1.2s ease-in-out 2;
+}
+
+.mcard--hl::before {
+  content: "★ MÓN BẠN ĐANG TÌM";
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 10;
+  padding: 8px 12px;
+  border-radius: 20px;
+  background: #ff6b00;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+}
+
+@keyframes mcardHighlightPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 4px rgba(255, 107, 0, 0.22),
+                0 8px 20px rgba(255, 107, 0, 0.22);
+  }
+  50% {
+    box-shadow: 0 0 0 9px rgba(255, 107, 0, 0.38),
+                0 12px 32px rgba(255, 107, 0, 0.45);
+  }
+}
 .mcard__head { display: flex; justify-content: space-between; gap: .5rem; align-items: start; }
 .mcard__meta { display: flex; gap: .5rem; align-items: center; font-size: .85rem; color: var(--muted); }
 .mcard__foot { display: flex; justify-content: space-between; align-items: end; margin-top: auto; padding-top: .5rem; }
