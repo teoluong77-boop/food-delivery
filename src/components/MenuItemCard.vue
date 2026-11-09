@@ -54,7 +54,7 @@ function addToCart() {
   if (cart.add(props.item, sanitizedOptions.value, unitPrice.value)) {
     justAdded.value = true
     setTimeout(() => (justAdded.value = false), 1200)
-  }
+  } 
 }
 </script>
 

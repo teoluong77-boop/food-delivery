@@ -18,7 +18,8 @@ export const useCartStore = defineStore('cart', {
     inStock: s => id => (s.stock[id] ?? 0) > 0
   },
   actions: {
-    add(item, options = {}, unitPrice) {
+    add(item, options = {}, unitPrice) { 
+      // kiểm tra tồn kho
       if ((this.stock[item.id] ?? 0) <= 0) return false
 
       const toppings = options.toppings || []
