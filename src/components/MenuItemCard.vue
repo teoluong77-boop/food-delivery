@@ -7,25 +7,19 @@ const props = defineProps({
   item: { type: Object, required: true },
   highlight: Boolean
 })
-
+// Khởi tạo đối tượng cart để sử dụng các hàm của giỏ hàng."
 const cart = useCartStore()
 const options = reactive({ size: 'S', spice: 0, toppings: [] })
 const showNutrition = ref(false)
 const justAdded = ref(false)
 
-// Phân loại nhóm món theo tags
 const isDrink = computed(() => props.item.tags?.includes('nước'))
 const isRiceOrSoup = computed(() => 
   props.item.tags?.includes('cơm') || props.item.tags?.includes('canh')
 )
 
-// Điều kiện hiển thị độ cay: không hiện cho nước, cơm và canh
 const canChooseSpice = computed(() => !isDrink.value && !isRiceOrSoup.value)
 
-// Lọc danh sách topping hiển thị cho từng món:
-// - Món nước: không có topping
-// - Cơm & canh: chỉ chọn Trứng hoặc Thêm rau, bỏ Phô mai
-// - Món khác (bún, mì, ăn vặt...): giữ nguyên danh sách topping
 const availableToppings = computed(() => {
   if (isDrink.value) return []
   if (isRiceOrSoup.value) {
@@ -34,7 +28,7 @@ const availableToppings = computed(() => {
   return toppings
 })
 
-// Chuẩn hóa tùy chọn hợp lệ để tính giá và gửi vào giỏ
+// sanitizedOptions giúp làm sạch dữ liệu trước khi gửi sang giỏ
 const sanitizedOptions = computed(() => {
   const allowedIds = new Set(availableToppings.value.map(t => t.id))
   return {
@@ -44,12 +38,13 @@ const sanitizedOptions = computed(() => {
   }
 })
 
-// Các giá trị suy ra từ state: tự cập nhật khi người dùng đổi tùy chọn / tồn kho đổi
+// tự động tính đơn giá theo thời gian thực
 const unitPrice = computed(() => priceOf(props.item, sanitizedOptions.value))
+// lấy số lượng tồn kho thực tế của món từ Pinia.
 const stockLeft = computed(() => cart.stock[props.item.id])
 const inStock = computed(() => stockLeft.value > 0)
 const onSale = computed(() => props.item.salePrice !== null)
-
+//gọi action add của giỏ hàng Pinia, sau đó bật thông báo 'Đã thêm' trong 1.2 giây. 
 function addToCart() {
   if (cart.add(props.item, sanitizedOptions.value, unitPrice.value)) {
     justAdded.value = true
@@ -80,14 +75,12 @@ function addToCart() {
     </p>
 
     <template v-if="inStock">
-      <!-- Chọn size: Áp dụng cho tất cả món -->
       <div class="opts">
         <label v-for="s in sizes" :key="s.id" class="chip">
           <input type="radio" v-model="options.size" :value="s.id" /> {{ s.label }}
         </label>
       </div>
 
-      <!-- Chọn độ cay: Tự động ẩn với Cơm, Canh và Nước -->
       <div v-if="canChooseSpice" class="opts">
         <label class="field">Độ cay
           <select v-model.number="options.spice">
@@ -96,7 +89,6 @@ function addToCart() {
         </label>
       </div>
 
-      <!-- Chọn topping: Ẩn Phô mai đối với Cơm/Canh, ẩn toàn bộ với Nước -->
       <div v-if="availableToppings.length" class="opts">
         <label v-for="t in availableToppings" :key="t.id" class="chip">
           <input type="checkbox" v-model="options.toppings" :value="t.id" />
@@ -111,6 +103,7 @@ function addToCart() {
         <s v-if="onSale" class="muted"> {{ formatVND(item.price) }}</s>
         <p class="muted small">{{ inStock ? `Còn ${stockLeft} phần` : 'Hết hàng' }}</p>
       </div>
+      // Nút Thêm vào giỏ có gắn thuộc tính disabled để tự động khóa lại khi món ăn hết hàng
       <button class="btn" :disabled="!inStock" @click="addToCart">
         {{ !inStock ? 'Hết hàng' : justAdded ? 'Đã thêm' : 'Thêm vào giỏ' }}
       </button>
