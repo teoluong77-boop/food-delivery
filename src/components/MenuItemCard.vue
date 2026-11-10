@@ -7,7 +7,8 @@ const props = defineProps({
   item: { type: Object, required: true },
   highlight: Boolean
 })
-// Khởi tạo đối tượng cart để sử dụng các hàm của giỏ hàng."
+
+// Khởi tạo đối tượng cart để sử dụng các hàm của giỏ hàng
 const cart = useCartStore()
 const options = reactive({ size: 'S', spice: 0, toppings: [] })
 const showNutrition = ref(false)
@@ -38,13 +39,14 @@ const sanitizedOptions = computed(() => {
   }
 })
 
-// tự động tính đơn giá theo thời gian thực
+// Tự động tính đơn giá theo thời gian thực
 const unitPrice = computed(() => priceOf(props.item, sanitizedOptions.value))
-// lấy số lượng tồn kho thực tế của món từ Pinia.
+// Lấy số lượng tồn kho thực tế của món từ Pinia
 const stockLeft = computed(() => cart.stock[props.item.id])
 const inStock = computed(() => stockLeft.value > 0)
 const onSale = computed(() => props.item.salePrice !== null)
-//gọi action add của giỏ hàng Pinia, sau đó bật thông báo 'Đã thêm' trong 1.2 giây. 
+
+// Gọi action add của giỏ hàng Pinia, sau đó bật thông báo 'Đã thêm' trong 1.2 giây
 function addToCart() {
   if (cart.add(props.item, sanitizedOptions.value, unitPrice.value)) {
     justAdded.value = true
@@ -103,7 +105,7 @@ function addToCart() {
         <s v-if="onSale" class="muted"> {{ formatVND(item.price) }}</s>
         <p class="muted small">{{ inStock ? `Còn ${stockLeft} phần` : 'Hết hàng' }}</p>
       </div>
-      // Nút Thêm vào giỏ có gắn thuộc tính disabled để tự động khóa lại khi món ăn hết hàng
+      <!-- Nút Thêm vào giỏ có gắn thuộc tính disabled để tự động khóa lại khi món ăn hết hàng -->
       <button class="btn" :disabled="!inStock" @click="addToCart">
         {{ !inStock ? 'Hết hàng' : justAdded ? 'Đã thêm' : 'Thêm vào giỏ' }}
       </button>
